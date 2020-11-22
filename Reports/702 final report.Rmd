@@ -1,5 +1,5 @@
 ---
-title: "Forecasting Crude Oil Price in US"
+title: "Forecasting Crude Oil Price in United States"
 author: "Zoe Zhu"
 date: "11/20/2020"
 output: html_document
@@ -36,7 +36,7 @@ rownames(oil_data) <- NULL
 
 ### Summary
 
-This report proposes a forecast method to predict crude oil price based on crude oil production and time, controlled for global economy and demand for oil. MA (2) model is fitted to the residuals of the linear regression of difference in oil price on difference in oil production and other predictors. Forecasted by this model, 95% prediction intervals successfully cover the true observations in the testing set.  
+This report proposes a forecast method to predict crude oil price based on crude oil production, controlled for global demand for oil. MA (2) model is fitted to the residuals of the linear regression of difference in oil price on difference in oil production, time, and indicators for global demand. Estimted by this model, the 95% prediction intervals of forecasted values successfully cover the true observations in the testing set.  
 
 ### Introduction 
 
@@ -131,9 +131,9 @@ p2 <- ggplot(y_train,aes(x=date,y=dreg$residuals))+geom_line()+theme_classic()+t
 grid.arrange(p1,p2,ncol=1)
 ```
 
-Before introducing ARIMA model, the stationarity requirement must be satisfied. Based on previous discussion, crude oil price and production are not stationary. Fitting a linear regression of oil price on oil production, time, recession and glut, residuals are not stationary as well. To meet the requirement for stationarity, differences between consecutive observations are computed and new variables `dprice` and `dprod` are used for model fitting. Therefore, fitting a linear regression of difference in oil price on difference of oil production, time, recession and glut, residuals seem to be stationary. Augmented Dickey-Fuller Test and KPSS Test confirm that residuals for the first order difference model are indeed stationary. Ljung–Box Test provides evidence of serial correlation. Detailed test results are in appendix. 
+Before introducing ARIMA model, the stationarity requirement must be satisfied. Based on previous discussion, crude oil price and production are not stationary. Fitting a linear regression of oil price on oil production, time, recession and glut, residuals are still not stationary. To meet the requirement for stationarity, differences between consecutive observations are computed and new variables `dprice` and `dprod` are used for model fitting. Therefore, fitting a linear regression of difference in oil price on difference of oil production, time, recession and glut, residuals seem to be stationary. Augmented Dickey-Fuller Test and KPSS Test confirm that residuals for this model are indeed stationary. Ljung–Box Test provides evidence of serial correlation. Detailed test results are in appendix. 
  
-Model selection is based on AIC forward selection. ACF and PACF plots suggest that residuals might follow MA (2) process. Using `auto.arima()` with external regressor difference in oil production, time and indicators for the Great Recession and 2010s Oil Supply Glut, the function returns the best ARIMA model according to AIC value. 
+Model selection is based on AIC with forward selection. ACF and PACF plots suggest that residuals might follow MA (2) process. Using `auto.arima()` with external regressors difference in oil production, time and indicators for the Great Recession and 2010s Oil Supply Glut, the function returns the best ARIMA model according to AIC value. 
  
 ### Final Model
 
@@ -222,7 +222,7 @@ Fitting a linear regression of difference in price on difference in production a
 
 ### Limitation
 
-In model diagnostics, properties of equal variance and normality are not satisfied. Since these two properties are not necessarily required and Box-Cox transformation did not improve significantly, the final model just takes difference in price and production with no data transformation. In the future, we could examine more methods for transformation and try alternative approach to obtain prediction intervals. In this case, the assumption of normality for forecast errors is violated, one alternative could be using bootstrapped residuals to obtained bootstrapped prediction interval. 
+In model diagnostics, properties of equal variance and normality are not satisfied. Since these two properties are not necessarily required and Box-Cox transformation did not improve significantly, the final model just takes difference in price and production with no data transformation. In the future, we could examine more methods for transformation and try alternative approachs to obtain prediction intervals. In this case, the assumption of normality for forecast errors is violated, one alternative could be using bootstrapped residuals to obtained bootstrapped prediction interval. 
  
 Crude oil price is notoriously difficult to predict and influenced by various factors. This report narrows the scope and only focuses on crude oil production, time and indicators for the Great Recession and 2010s Oil Supply Glut with 554 monthly observations. With more background research, we could expand and include more relevant variables and hopefully address the influence of COVID-19 pandemic with advanced approaches. 
  
